@@ -32,7 +32,7 @@ class ItemClassifier(nn.Module):
                 stride=1,
             ),  # (32,108,108)
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2),  # (32,54,54)
+            nn.MaxPool2d(kernel_size=2, stride=2),  # (32,54,54)
         )
         self.fc = nn.Sequential(
             nn.Linear(
@@ -47,6 +47,6 @@ class ItemClassifier(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.cnn(x)
-        x = torch.flatten(x)
+        x = torch.flatten(x, start_dim=1)
         x = self.fc(x)
         return x

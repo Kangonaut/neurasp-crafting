@@ -5,7 +5,7 @@ import torch
 from PIL import Image
 from torch import Tensor
 from torch.utils.data import Dataset
-from torchvision.transforms.functional import pil_to_tensor
+from torchvision.transforms.functional import normalize, pil_to_tensor
 
 
 @dataclass
@@ -18,8 +18,9 @@ class ItemDataset(Dataset):
     def __init__(self, path: Path) -> None:
         super().__init__()
         self.path = path
+        self.num_classes = len(list(self.path.iterdir()))
         self.samples = self.__load_samples()
-        self.mean, self.std = self.__calc_dataset_stats()
+        self.mean, self.std = map(Tensor.tolist, self.__calc_dataset_stats())
 
     def __calc_dataset_stats(self):
         tensors = []
@@ -48,5 +49,6 @@ class ItemDataset(Dataset):
     def __getitem__(self, idx) -> tuple[Tensor, int]:
         sample = self.samples[idx]
         img = Image.open(sample.path)
-        t = pil_to_tensor(img)
+        t = pil_to_tensor(img).float()
+        t = normalize(t, self.mean, self.std)
         return (t, sample.class_idx)
