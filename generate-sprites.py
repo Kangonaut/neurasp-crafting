@@ -6,8 +6,8 @@ from PIL import Image
 
 INPUT_PATH = Path.cwd() / "sprites.png"
 
-OUTPUT_PATH = Path.cwd() / "sprites"
-OUTPUT_PATH.mkdir(exist_ok=True)
+OUTPUT_PATH = Path.cwd() / "sprites" / "original"
+OUTPUT_PATH.mkdir(exist_ok=True, parents=True)
 
 img = Image.open(INPUT_PATH)
 img = np.array(img)
