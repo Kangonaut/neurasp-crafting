@@ -5,10 +5,10 @@ items:
   - src: 10-1
     name: axe
   - src: 19-11
-    name: wood-plank
+    name: wood_plank
   - src: 20-1
   # coffee
-    name: coffee-powder
+    name: coffee_powder
   - src: 15-14
     name: coffee
   - src: 0-10
@@ -18,13 +18,11 @@ items:
   - src: 11-12
     name: mortar
   - src: 12-6
-    name: coffee-beans
+    name: coffee_beans
   # plant
   - src: 12-3
-    name: plant-small
-  - src: 12-4
-    name: plant-medium
+    name: sampling
   - src: 12-5
-    name: plant-big
-  - src: 0-7
-    name: time
+    name: plant
+  - src: 21-8
+    name: sunlight
