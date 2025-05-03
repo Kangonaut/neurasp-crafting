@@ -17,3 +17,5 @@ class Item(BaseModel):
 class StripsConfig(BaseModel):
     items: list[Item]
     actions: list[Action]
+    time_steps: int
+    inventory_size: int

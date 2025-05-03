@@ -2,58 +2,10 @@ import random
 from pathlib import Path
 
 from clingo import Control
-from PIL import Image, ImageFilter
-from pydantic_yaml import parse_yaml_file_as
+from PIL import Image
 
-from config import Action, Item, StripsConfig
-
-
-def add_margin(
-    img: Image.Image,
-    pos: tuple[int, int],
-    inner_size: int,
-    outer_size: int,
-    fillcolor: tuple[int, int, int],
-    mode="RGB",
-) -> Image.Image:
-    x, y = pos
-    res = Image.new(mode, (outer_size, outer_size), fillcolor)
-    resized_img = img.resize((inner_size, inner_size))
-    res.paste(resized_img, (x, y))
-    return res
-
-
-def augment_image(
-    img: Image.Image,
-    img_size: int,
-    fillcolor: tuple[int, int, int],
-) -> Image.Image:
-    angle = random.random() * 180 - 90
-    img = img.rotate(angle, expand=True, fillcolor=fillcolor)
-
-    size = random.randint(img_size, img_size)
-    pos = tuple(random.randint(0, img_size - size) for _ in range(2))
-    img = add_margin(img, pos, inner_size=size, outer_size=img_size, fillcolor=fillcolor)  # type: ignore
-
-    delta = size // 5  # how much of the image we allow to be obscured
-    delta_x = random.randint(-(img_size - (pos[0] + size) + delta), pos[0] + delta)
-    delta_y = random.randint(-(img_size - (pos[1] + size) + delta), pos[1] + delta)
-    img = img.transform(
-        size=img.size,
-        method=Image.AFFINE,  # type: ignore
-        data=(1, 0, delta_x, 0, 1, delta_y),
-        fillcolor=fillcolor,
-    )
-
-    radius = random.randint(1, 3)
-    img = img.filter(ImageFilter.GaussianBlur(radius))
-
-    return img
-
-
-def load_config(path: Path) -> StripsConfig:
-    with open(path, "r") as file:
-        return parse_yaml_file_as(StripsConfig, file)
+from config import Item
+from utils import augment_image, generate_asp_program, load_config
 
 
 def generate_samples(
@@ -62,8 +14,8 @@ def generate_samples(
     num_samples: int,
     path: Path,
     time_steps: int,
+    inventory_size: int,
     min_init: int = 3,
-    max_init: int = 8,
     num_finals: int = 5,
     img_size: int = 32,
     fillcolor: tuple[int, int, int] = (255, 255, 255),
@@ -90,10 +42,10 @@ def generate_samples(
 
     while curr_samples < num_samples:
         # generate initial inventory
-        num_init = random.randint(min_init, max_init)
+        num_init = random.randint(min_init, inventory_size)
         init = random.sample(item_ids, k=num_init)
         init.extend(
-            [blank_id] * (max_init - len(init))
+            [blank_id] * (inventory_size - len(init))
         )  # fill remaining spaces with blank
 
         # generate facts for initial inventory
@@ -129,7 +81,7 @@ def generate_samples(
         )
 
         # fill remaining spaces with blank
-        finals = [f + (blank_id,) * (max_init - len(f)) for f in finals]
+        finals = [f + (blank_id,) * (inventory_size - len(f)) for f in finals]
 
         # create the sample
         for sample_idx, final in enumerate(finals, start=curr_samples):
@@ -156,60 +108,12 @@ def generate_samples(
         curr_samples += len(finals)
 
 
-def generate_asp_program(
-    actions: list[Action],
-    items: list[Item],
-    time_steps: int,
-    dataset_generation: bool,
-    blank_id: int = -1,
-) -> str:
-    item_mapping: dict[str, int] = {item.name: item.id for item in items}
-
-    program: list[str] = []
-
-    # fundamental rules
-    program = [
-        f"time(1..{time_steps}).",
-        # initial inventory
-        f"have(X,0) :- init(X).",
-        # action rules
-        f"{{ occur(A,T) : action(A) }} = 1 :- time(T).",
-        f":- occur(A,T), pre(A,I), not have(I,T-1).",
-        f"have(I,T) :- time(T), have(I,T-1), not occur(A,T) : del(A,I).",
-        f"have(I,T) :- occur(A,T), add(A,I).",
-    ]
-
-    if not dataset_generation:
-        program.append(f":- goal(X), not have(X,{time_steps}).")
-        program.append(f":- have(X,{time_steps}), not goal(X).")
-
-    # add items
-    program.append(f"item({blank_id}).")
-    for item in items:
-        program.append(f"item({item.id}).")
-
-    # add actions
-    for action in actions:
-        program.append(f"action({action.name}).")
-
-        for x in action.preconditions:
-            program.append(f"pre({action.name},{item_mapping[x]}).")
-
-        for x in action.add_list:
-            program.append(f"add({action.name},{item_mapping[x]}).")
-
-        for x in action.delete_list:
-            program.append(f"del({action.name},{item_mapping[x]}).")
-
-    return "\n".join(program)
-
-
-TIME_STEPS = 3
 config = load_config(Path.cwd() / "strips.yml")
 asp_program = generate_asp_program(
     actions=config.actions,
     items=config.items,
-    time_steps=TIME_STEPS,
+    time_steps=config.time_steps,
+    inventory_size=config.inventory_size,
     dataset_generation=True,
 )
 print(asp_program)
@@ -217,6 +121,7 @@ generate_samples(
     asp_program=asp_program,
     items=config.items,
     num_samples=10,
-    time_steps=TIME_STEPS,
+    time_steps=config.time_steps,
+    inventory_size=config.inventory_size,
     path=Path.cwd() / "data",
 )

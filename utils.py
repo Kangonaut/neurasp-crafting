@@ -1,11 +1,16 @@
+import random
 from pathlib import Path
 
 import torch
+from PIL import Image, ImageFilter
+from pydantic_yaml import parse_yaml_file_as
 from torch import device
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+
+from config import Action, Item, StripsConfig
 
 
 def train(
@@ -96,3 +101,110 @@ def train_epochs(
 
     if storage_dir:
         torch.save(model, storage_dir / "last.pt")
+
+
+def generate_asp_program(
+    actions: list[Action],
+    items: list[Item],
+    time_steps: int,
+    inventory_size: int,
+    dataset_generation: bool = False,
+    blank_id: int = -1,
+) -> str:
+    item_mapping: dict[str, int] = {item.name: item.id for item in items}
+
+    program: list[str] = []
+
+    # fundamental rules
+    program = [
+        f"time(1..{time_steps}).",
+        # initial inventory
+        f"have(X,0) :- init(X).",
+        # action rules
+        f"{{ occur(A,T) : action(A) }} = 1 :- time(T).",
+        f":- occur(A,T), pre(A,I), not have(I,T-1).",
+        f"have(I,T) :- time(T), have(I,T-1), not occur(A,T) : del(A,I).",
+        f"have(I,T) :- occur(A,T), add(A,I).",
+    ]
+
+    if not dataset_generation:
+        # add inventory images
+        for idx in range(inventory_size)
+            program.append(f"init_img(img{idx}).")
+            program.append(f"final_img(img{idx}).")
+
+        # add identify mappings
+        program.append("init(X) :- identify(0,I,X), init_img(I).")
+        program.append("final(X) :- identify(0,I,X), final_img(I).")
+
+        # add final inventory constraints
+        program.append(f":- final(X), not have(X,{time_steps}).")
+        program.append(f":- have(X,{time_steps}), not final(X).")
+
+    # add items
+    program.append(f"item({blank_id}).")
+    for item in items:
+        program.append(f"item({item.id}).")
+
+    # add actions
+    for action in actions:
+        program.append(f"action({action.name}).")
+
+        for x in action.preconditions:
+            program.append(f"pre({action.name},{item_mapping[x]}).")
+
+        for x in action.add_list:
+            program.append(f"add({action.name},{item_mapping[x]}).")
+
+        for x in action.delete_list:
+            program.append(f"del({action.name},{item_mapping[x]}).")
+
+    return "\n".join(program)
+
+
+def add_margin(
+    img: Image.Image,
+    pos: tuple[int, int],
+    inner_size: int,
+    outer_size: int,
+    fillcolor: tuple[int, int, int],
+    mode="RGB",
+) -> Image.Image:
+    x, y = pos
+    res = Image.new(mode, (outer_size, outer_size), fillcolor)
+    resized_img = img.resize((inner_size, inner_size))
+    res.paste(resized_img, (x, y))
+    return res
+
+
+def augment_image(
+    img: Image.Image,
+    img_size: int,
+    fillcolor: tuple[int, int, int],
+) -> Image.Image:
+    angle = random.random() * 180 - 90
+    img = img.rotate(angle, expand=True, fillcolor=fillcolor)
+
+    size = random.randint(img_size, img_size)
+    pos = tuple(random.randint(0, img_size - size) for _ in range(2))
+    img = add_margin(img, pos, inner_size=size, outer_size=img_size, fillcolor=fillcolor)  # type: ignore
+
+    delta = size // 5  # how much of the image we allow to be obscured
+    delta_x = random.randint(-(img_size - (pos[0] + size) + delta), pos[0] + delta)
+    delta_y = random.randint(-(img_size - (pos[1] + size) + delta), pos[1] + delta)
+    img = img.transform(
+        size=img.size,
+        method=Image.AFFINE,  # type: ignore
+        data=(1, 0, delta_x, 0, 1, delta_y),
+        fillcolor=fillcolor,
+    )
+
+    radius = random.randint(1, 3)
+    img = img.filter(ImageFilter.GaussianBlur(radius))
+
+    return img
+
+
+def load_config(path: Path) -> StripsConfig:
+    with open(path, "r") as file:
+        return parse_yaml_file_as(StripsConfig, file)
