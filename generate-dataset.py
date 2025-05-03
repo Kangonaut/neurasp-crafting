@@ -97,13 +97,13 @@ def generate_samples(
             for idx, item in enumerate(init):
                 img = item_imgs[item]
                 img = augment_image(img, img_size, fillcolor)
-                img.save(sample_path / f"init-{idx}.png")
+                img.save(sample_path / f"init_img_{idx}.png")
 
             # generate final images
             for idx, item in enumerate(final):
                 img = item_imgs[item]
                 img = augment_image(img, img_size, fillcolor)
-                img.save(sample_path / f"final-{idx}.png")
+                img.save(sample_path / f"final_img_{idx}.png")
 
         curr_samples += len(finals)
 

@@ -27,14 +27,14 @@ run_number = get_run_number()
 results_path = RESULTS_DIR / f"train-{run_number}"
 results_path.mkdir(exist_ok=True, parents=True)
 
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 train_ds = ItemDataset(TRAIN_PATH)
 train_dl = DataLoader(train_ds, batch_size=4, shuffle=True)
 
 network = ItemClassifier(train_ds.num_classes).to(device)
 loss_fn = CrossEntropyLoss()
-optim = Adam(network.parameters(), lr=0.001)
+optim = Adam(network.parameters(), lr=0.0001)
 
 
 train_epochs(

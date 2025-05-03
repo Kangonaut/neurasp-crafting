@@ -1,4 +1,5 @@
 import random
+from os import wait
 from pathlib import Path
 
 import torch
@@ -129,9 +130,9 @@ def generate_asp_program(
 
     if not dataset_generation:
         # add inventory images
-        for idx in range(inventory_size)
-            program.append(f"init_img(img{idx}).")
-            program.append(f"final_img(img{idx}).")
+        for idx in range(inventory_size):
+            program.append(f"init_img(init_img_{idx}).")
+            program.append(f"final_img(init_img_{idx}).")
 
         # add identify mappings
         program.append("init(X) :- identify(0,I,X), init_img(I).")
