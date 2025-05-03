@@ -1,10 +1,19 @@
 from pydantic import BaseModel
 
 
-class ItemSelection(BaseModel):
-    src: str
+class Action(BaseModel):
+    name: str
+    preconditions: list[str]
+    add_list: list[str]
+    delete_list: list[str]
+
+
+class Item(BaseModel):
+    id: int
+    path: str
     name: str
 
 
-class SelectionConfig(BaseModel):
-    items: list[ItemSelection]
+class StripsConfig(BaseModel):
+    items: list[Item]
+    actions: list[Action]

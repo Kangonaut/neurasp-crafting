@@ -1,0 +1,59 @@
+items:
+  - id: 0
+    path: ./sprites/21-8.png
+    name: sunlight
+  - id: 1
+    path: ./sprites/17-0.png
+    name: wood
+  - id: 2
+    path: ./sprites/10-1.png
+    name: axe
+  - id: 3
+    path: ./sprites/19-11.png
+    name: wood_plank
+  - id: 4
+    path: ./sprites/20-1.png
+    name: coffee_powder
+  - id: 5
+    path: ./sprites/15-14.png
+    name: coffee
+  - id: 6
+    path: ./sprites/0-10.png
+    name: water
+  - id: 7
+    path: ./sprites/15-8.png
+    name: bottle
+  - id: 8
+    path: ./sprites/11-12.png
+    name: mortar
+  - id: 9
+    path: ./sprites/12-6.png
+    name: coffee_beans
+  - id: 10
+    path: ./sprites/12-3.png
+    name: sampling
+  - id: 11
+    path: ./sprites/12-5.png
+    name: plant
+  - id: 12
+    path: ./sprites/21-8.png
+    name: sunlight
+actions:
+  - name: cut_wood
+    preconditions:
+      - axe
+    add_list:
+      - wood
+    delete_list:
+      - axe
+  - name: make_coffee
+    preconditions:
+      - coffee_beans
+    add_list:
+      - coffee
+    delete_list:
+      - coffee_beans
+  - name: wait
+    preconditions: []
+    add_list: []
+    delete_list: []
