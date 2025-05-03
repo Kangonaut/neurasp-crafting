@@ -110,7 +110,7 @@ def generate_asp_program(
     time_steps: int,
     inventory_size: int,
     dataset_generation: bool = False,
-    blank_id: int = -1,
+    blank_id: int = 0,
 ) -> str:
     item_mapping: dict[str, int] = {item.name: item.id for item in items}
 

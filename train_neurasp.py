@@ -17,10 +17,12 @@ asp_program = generate_asp_program(
 )
 
 item_ids = {item.id for item in config.items}
+item_ids.add(0)
 neural_atoms = f"""
 nn(identify(1,I), [{','.join(map(str, item_ids))}]) :- init_img(I).
 nn(identify(1,I), [{','.join(map(str, item_ids))}]) :- final_img(I).
 """
+print(neural_atoms)
 
 # dataset
 train_ds = InventoryDataset(path=Path.cwd() / "data")
@@ -29,7 +31,7 @@ data_list = [sample[0] for sample in samples]
 obs_list = [sample[1] for sample in samples]
 
 # neural network
-network = ItemClassifier(num_classes=len(config.items))
+network = ItemClassifier(num_classes=len(config.items) + 1)
 nn_mapping = {"identify": network}
 optimizers = {"identify": torch.optim.Adam(network.parameters(), lr=0.0001)}
 

@@ -20,7 +20,7 @@ def generate_samples(
     img_size: int = 32,
     fillcolor: tuple[int, int, int] = (255, 255, 255),
     img_mode="RGB",
-    blank_id: int = -1,
+    blank_id: int = 0,
 ) -> None:
     try:
         path.mkdir()

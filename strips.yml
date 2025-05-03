@@ -1,9 +1,6 @@
 time_steps: 3
 inventory_size: 8
 items:
-  # - id: 0
-  #   path: ./sprites/21-8.png
-  #   name: sunlight
   - id: 1
     path: ./sprites/17-0.png
     name: wood
