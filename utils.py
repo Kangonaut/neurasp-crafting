@@ -14,7 +14,7 @@ def train(
     dl: DataLoader,
     loss_fn: Module,
     optim: Optimizer,
-    device: device | str,
+    device: device,
 ) -> tuple[float, float]:
     model.train()
     total_loss: float = 0
@@ -31,7 +31,7 @@ def train(
         loss.backward()
         optim.step()
 
-        num_correct += (y == torch.argmax(pred)).int().sum().item()
+        num_correct += (y == torch.argmax(pred, dim=1)).int().sum().item()
         total_loss += loss.item()
         progress.desc = f"[TRAIN] loss: {loss / X.size(0):.4f}"
 
@@ -56,7 +56,7 @@ def test(
             pred = model(X)
             loss = loss_fn(pred, y)
 
-            num_correct += (y == torch.argmax(pred)).int().sum().item()
+            num_correct += (y == torch.argmax(pred, dim=1)).int().sum().item()
             total_loss += loss.item()
             progress.desc = f"[TEST]: loss: {loss / X.size(0):.4f}"
 
@@ -70,7 +70,7 @@ def train_epochs(
     test_dl: DataLoader,
     loss_fn: Module,
     optim: Optimizer,
-    device: device | str,
+    device: device,
     num_epochs: int,
     storage_dir: Path | None = None,
 ) -> None:
