@@ -2,7 +2,6 @@ from pathlib import Path
 
 import torch
 from torch import device
-from torch._prims_common import number_type
 from torch.nn import Module
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
@@ -18,6 +17,7 @@ def train(
 ) -> tuple[float, float]:
     model.train()
     total_loss: float = 0
+    num_total: int = 0
     num_correct: int = 0
 
     for X, y in (progress := tqdm(dl)):
@@ -31,12 +31,12 @@ def train(
         loss.backward()
         optim.step()
 
+        num_total += X.size(0)
         num_correct += (y == torch.argmax(pred, dim=1)).int().sum().item()
         total_loss += loss.item()
         progress.desc = f"[TRAIN] loss: {loss / X.size(0):.4f}"
 
-    num_samples = len(dl) * X.size(0)  # type: ignore
-    return total_loss / num_samples, num_correct / num_samples
+    return total_loss / num_total, num_correct / num_total
 
 
 def test(
@@ -47,6 +47,7 @@ def test(
 ) -> tuple[float, float]:
     model.eval()
     total_loss: float = 0.0
+    num_total: int = 0
     num_correct: int = 0
 
     with torch.no_grad():
@@ -56,12 +57,12 @@ def test(
             pred = model(X)
             loss = loss_fn(pred, y)
 
+            num_total += X.size(0)
             num_correct += (y == torch.argmax(pred, dim=1)).int().sum().item()
             total_loss += loss.item()
             progress.desc = f"[TEST]: loss: {loss / X.size(0):.4f}"
 
-    num_samples = len(dl) * X.size(0)  # type: ignore
-    return total_loss / num_samples, num_correct / num_samples
+    return total_loss / num_total, num_correct / num_total
 
 
 def train_epochs(
