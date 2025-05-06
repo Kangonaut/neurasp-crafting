@@ -1,6 +1,56 @@
 # NeurASP Crafting
 
-- [Icon Pack](https://shikashipx.itch.io/shikashis-fantasy-icons-pack?download)
+## Credit
+
+- original NeurASP paper: [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700) by **Zhun Yang, Adam Ishay and Joohyung Lee**
+- [original implementation](https://github.com/azreasoners/NeurASP) of the NeurASP architecture
+- this project makes use of the [icon pack](https://shikashipx.itch.io/shikashis-fantasy-icons-pack) by [shikashipx](https://itch.io/profile/shikashipx)
+
+## Setup
+
+1. Clone this repo using
+
+    ```console
+    git clone https://github.com/Kangonaut/neurasp-crafting.git
+    ```
+
+1. If you are using [`uv`](https://github.com/astral-sh/uv), simply install all dependencies using
+
+    ```console
+    uv sync --extra cpu     # if you simply want to use your CPU
+    uv sync --extra cu118   # if you want to use CUDA 11.8
+    uv sync --extra cu124   # if you want to use CUDA 12.4
+    uv sync --extra cu126   # if you want to use CUDA 12.6
+    ```
+
+1. Otherwise, simply use your package manager of choice. E.g. `pip`:
+
+    ```console
+    pip install -r pyproject.toml
+    ```
+
+    > [!WARNING]
+    > In case you are NOT using `uv`, you need to install `torch` and `torchvision` manually.
+
+1. Download the icon pack [here](https://shikashipx.itch.io/shikashis-fantasy-icons-pack).
+1. Extract the ZIP file and rename the `BG 10.png` file to `sprites.png` and save it in the project's root folder.
+1. Generate the individual sprites using
+
+    ```console
+    uv run generate-sprites.py
+    ```
+
+1. Next, generate the dataset using
+
+    ```console
+    uv run generate-dataset.py
+    ```
+
+1. Finally, training!!! :D
+
+    ```console
+    uv run train-neurasp.py
+    ```
 
 ## Find Stable Models
 
