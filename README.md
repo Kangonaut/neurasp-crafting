@@ -1,12 +1,22 @@
 # NeurASP Crafting
 
-## Credit
+## ToC
 
-- original NeurASP paper: [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700) by **Zhun Yang, Adam Ishay and Joohyung Lee**
-- [original implementation](https://github.com/azreasoners/NeurASP) of the NeurASP architecture
-- this project makes use of the [icon pack](https://shikashipx.itch.io/shikashis-fantasy-icons-pack) by [shikashipx](https://itch.io/profile/shikashipx)
++ [Credit](#credit)
++ [Setup](#setup)
++ [Configuration](#config)
++ [Training](#training)
++ [Testing](#testing)
++ [Things to Try](#things-to-try)
++ [Want to learn about ASP and NeurASP](#resources)
 
-## Setup
+## Credit <a name="credit"></a>
+
++ original NeurASP paper: [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700) by **Zhun Yang, Adam Ishay and Joohyung Lee**
++ [original implementation](https://github.com/azreasoners/NeurASP) of the NeurASP architecture
++ this project makes use of the [icon pack](https://shikashipx.itch.io/shikashis-fantasy-icons-pack) by [shikashipx](https://itch.io/profile/shikashipx)
+
+## Setup <a name="setup"></a>
 
 1. Clone this repo using
 
@@ -15,7 +25,7 @@
     ```
 
 1. If you are using [`uv`](https://github.com/astral-sh/uv), simply install all dependencies using
-    - **NOTE:** Since the CNN used in this example is very small, it does not make a huge difference if you use a GPU or not.
+    + **NOTE:** Since the CNN used in this example is very small, it does not make a huge difference if you use a GPU or not.
 
     ```console
     uv sync --extra cpu     # if you simply want to use your CPU
@@ -25,7 +35,7 @@
     ```
 
 1. Otherwise, simply use your package manager of choice. E.g. `pip`:
-    - **NOTE:** In case you are NOT using `uv`, you need to install `torch` and `torchvision` manually.
+    + **NOTE:** In case you are NOT using `uv`, you need to install `torch` and `torchvision` manually.
 
     ```console
     pip install -r pyproject.toml
@@ -51,23 +61,23 @@
     uv run train-neurasp.py
     ```
 
-## Configuration
+## Configuration <a name="config"></a>
 
 The `strips.yml` file defines the configuration parameters for the task that the model is supposed to solve.
 
-- `time_steps`: each action requires one time steps, so this parameter defines the amount of actions that are applied between the initial and final inventory state
-- `inventory_size`: the maximum amount of initial items in the inventory
-- `items`: the available items
-  - `id`: a unique identifier of the item
-    - **NOTE:** `0` is a reserved identifier for the blank item (i.e. no item)
-  - `name`: a human readable identifier
-  - `path`: the path to the item sprite
-- `actions:` the available actions
-  - `name`: a unique identifier of the action
-    - **NOTE:** must only consist of upper case letters, lower case letters and the underscore `_` character
-  - `preconditions`: the items needed to apply this action
-  - `add_list`: the items that are created when applying this action
-  - `delete_list`: the items that are consumed/removed when applying this action
++ `time_steps`: each action requires one time steps, so this parameter defines the amount of actions that are applied between the initial and final inventory state
++ `inventory_size`: the maximum amount of initial items in the inventory
++ `items`: the available items
+  + `id`: a unique identifier of the item
+    + **NOTE:** `0` is a reserved identifier for the blank item (i.e. no item)
+  + `name`: a human readable identifier
+  + `path`: the path to the item sprite
++ `actions:` the available actions
+  + `name`: a unique identifier of the action
+    + **NOTE:** must only consist of upper case letters, lower case letters and the underscore `_` character
+  + `preconditions`: the items needed to apply this action
+  + `add_list`: the items that are created when applying this action
+  + `delete_list`: the items that are consumed/removed when applying this action
 
 ```yml
 time_steps: 2
@@ -116,7 +126,7 @@ actions:
     delete_list: []
 ```
 
-## Training
+## Training <a name="training"></a>
 
 For training, there are two options. Firstly, you can train the simply CNN network, which means there is no logic layer involved, just plain old deep learning. You may want to this, if you want to test the NeurASP model with a pre-trained neural network. The model weights will be stored in `./results/network/train-RUN/`, where `RUN` will be replaced by the next run number (starting with 0). The script saves both the best model weights (based on the validation accuracy) as `best.pt` and final models weights after the entire training run as `last.pt`.
 
@@ -151,7 +161,7 @@ CNN test accuracy: 50.00 %
 > [!TIP]
 > **Experiencing lengthy training durations?** Since training requires computing all the stable models for each sample in the dataset, it is a very intensive and CPU heavy task. So it takes a lot of time and cannot be sped up with GPU utilization. I recommend keeping the amount of items and actions small, in order to reduce the search space for stable models.
 
-## Testing
+## Testing <a name="testing"></a>
 
 You can either test the CNN or the entire NeurASP model. For the former, you first need to look up the path to the model weights. If you trained your model using the `train-network.py` script, this will be similar to `./results/network/train-0/best.pt`. If you trained your model using the `train-neurasp.py` script, it will instead be something like `./results/neurasp/train-0/identify/best.pt`, where `identify` is the unique identifier for the neural network in the NeurASP model. Now, simply pass this path as the `--model` argument to the `test-network.py` script.
 
@@ -170,7 +180,7 @@ NeurASP test accuracy: 71.00 %
 CNN test accuracy: 71.00 %
 ```
 
-## Things to Try
+## Things to Try <a name="things-to-try"></a>
 
 ### Generate the ASP Program
 
@@ -236,11 +246,11 @@ So, as we can see, in the first scenario (i.e. the first stable model), we simpl
 In the second and third scenarios, we grind the coffee beans in one time step and wait in the other one.
 Finally, in the fourth scenario, we first grind coffee beans and then make our coffee. :D
 
-## Want to learn about ASP and NeurASP?
+## Want to learn about ASP and NeurASP? <a name="resources"></a>
 
 Here are some useful resources:
 
-- [Answer set solving in practice - a graduate course at the University of Potsdam](https://teaching.potassco.org/)
-- [clingo and gringo - ASP grounding and solving](https://potassco.org/clingo/)
-- [Neuro Symbolic Reasoning and Learning](https://link.springer.com/book/10.1007/978-3-031-39179-8)
-- [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700)
++ [Answer set solving in practice - a graduate course at the University of Potsdam](https://teaching.potassco.org/)
++ [clingo and gringo - ASP grounding and solving](https://potassco.org/clingo/)
++ [Neuro Symbolic Reasoning and Learning](https://link.springer.com/book/10.1007/978-3-031-39179-8)
++ [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700)
