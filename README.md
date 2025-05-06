@@ -145,3 +145,12 @@ CPU Time     : 0.001s
 So, as we can see, in the first scenario (i.e. the first stable model), we simply wait for two time steps.
 In the second and third scenarios, we grind the coffee beans in one time step and wait in the other one.
 Finally, in the fourth scenario, we first grind coffee beans and then make our coffee. :D
+
+## Want to learn about ASP and NeurASP?
+
+Here are some useful resources:
+
+- [Answer set solving in practice - a graduate course at the University of Potsdam](https://teaching.potassco.org/)
+- [clingo and gringo - ASP grounding and solving](https://potassco.org/clingo/)
+- [Neuro Symbolic Reasoning and Learning](https://link.springer.com/book/10.1007/978-3-031-39179-8)
+- [NeurASP: Embracing Neural Networks into Answer Set Programming](https://arxiv.org/abs/2307.07700)
