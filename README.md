@@ -7,9 +7,8 @@
 Let's say, you want to check what things you can craft with *coffee beans* *water* and a *mortar*.
 Simply generate the ASP program with the initial inventory and then pass it on to `clingo`:
 
-```shell
+```console
 $ uv run generate-program.py --init coffee_beans water mortar | clingo 0
-
 clingo version 5.8.0 (6d1efb6)
 Reading from stdin
 Solving...
