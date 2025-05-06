@@ -26,3 +26,5 @@ for row, col in itertools.product(range(NUM_ROWS), range(NUM_COLS)):
         continue
 
     Image.fromarray(sprite).save(OUTPUT_PATH / f"{row}-{col}.png")
+
+print(f"sprites saved to: {OUTPUT_PATH}")

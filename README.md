@@ -29,8 +29,8 @@
     pip install -r pyproject.toml
     ```
 
-    > [!WARNING]
-    > In case you are NOT using `uv`, you need to install `torch` and `torchvision` manually.
+> [!WARNING]
+> In case you are NOT using `uv`, you need to install `torch` and `torchvision` manually.
 
 1. Download the icon pack [here](https://shikashipx.itch.io/shikashis-fantasy-icons-pack).
 1. Extract the ZIP file and rename the `BG 10.png` file to `sprites.png` and save it in the project's root folder.
