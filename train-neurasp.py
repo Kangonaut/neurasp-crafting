@@ -9,6 +9,9 @@ from neurasp.neurasp import NeurASP
 from utils import (generate_asp_program, generate_neural_atoms, get_run_number,
                    load_config, neurasp_test, neurasp_train_epochs)
 
+NUM_EPOCHS: int = 1
+LR: float = 0.0001
+
 CONFIG_PATH = Path.cwd() / "strips.yml"
 TRAIN_PATH = Path.cwd() / "dataset" / "train"
 VALID_PATH = Path.cwd() / "dataset" / "valid"
@@ -41,7 +44,7 @@ network = ItemClassifier(
     num_classes=len(config.items) + 1,  # all items including blank
 )
 nn_mapping = {"identify": network}
-optimizers = {"identify": torch.optim.Adam(network.parameters(), lr=0.0001)}
+optimizers = {"identify": torch.optim.Adam(network.parameters(), lr=LR)}
 
 # NeurASP model
 model = NeurASP(
@@ -55,7 +58,7 @@ neurasp_train_epochs(
     model=model,
     train_ds=train_ds,
     valid_ds=valid_ds,
-    num_epochs=2,
+    num_epochs=NUM_EPOCHS,
     storage_dir=storage_dir,
 )
 

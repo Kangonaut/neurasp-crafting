@@ -9,6 +9,9 @@ from datasets import ItemDataset
 from network import ItemClassifier
 from utils import get_run_number, load_config, test, train_epochs
 
+NUM_EPOCHS: int = 1
+LR: float = 0.0001
+
 CONFIG_PATH = Path.cwd() / "strips.yml"
 TRAIN_PATH = Path.cwd() / "dataset" / "train"
 VALID_PATH = Path.cwd() / "dataset" / "valid"
@@ -34,7 +37,7 @@ network = ItemClassifier(
     num_classes=len(config.items) + 1,  # all items including blank
     neurasp=False,
 ).to(device)
-optim = Adam(network.parameters(), lr=0.0001)
+optim = Adam(network.parameters(), lr=LR)
 loss_fn = CrossEntropyLoss()
 
 # training
@@ -45,7 +48,7 @@ train_epochs(
     loss_fn=loss_fn,
     optim=optim,
     device=device,
-    num_epochs=5,
+    num_epochs=NUM_EPOCHS,
     storage_dir=storage_dir,
 )
 

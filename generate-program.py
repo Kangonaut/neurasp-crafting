@@ -12,7 +12,7 @@ parser = ArgumentParser()
 parser.add_argument("-i", "--init", action="extend", nargs="+")
 args = parser.parse_args()
 
-init = "\n".join(f"init({item_mapping[token]})." for token in args.init)
+init = "\n".join(f"init({item_mapping[token]})." for token in (args.init or []))
 
 program = generate_asp_program(
     actions=config.actions,

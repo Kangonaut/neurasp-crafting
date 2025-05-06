@@ -116,7 +116,97 @@ actions:
     delete_list: []
 ```
 
-## Find Stable Models
+## Training
+
+For training, there are two options. Firstly, you can train the simply CNN network, which means there is no logic layer involved, just plain old deep learning. You may want to this, if you want to test the NeurASP model with a pre-trained neural network. The model weights will be stored in `./results/network/train-RUN/`, where `RUN` will be replaced by the next run number (starting with 0). The script saves both the best model weights (based on the validation accuracy) as `best.pt` and final models weights after the entire training run as `last.pt`.
+
+```console
+$ uv run train-network.py
+[TRAIN] loss: 0.0508: 100%|█████████████| 1000/1000 [00:03<00:00, 287.56it/s]
+[TRAIN] epoch 1:
+        loss: 0.1187
+        accuracy: 83.20 %
+[VALID]: loss: 0.0022: 100%|██████████████| 200/200 [00:00<00:00, 537.57it/s]
+[VALID] epoch 1:
+        loss: 0.0354
+        accuracy: 96.75 %
+[TEST]: loss: 0.0528: 100%|███████████████| 200/200 [00:00<00:00, 459.89it/s]
+test loss: 0.0344
+test accuracy: 96.75 %
+```
+
+The second (and more interesting) option is to train the NeurASP model. This means that you will start off with a fresh CNN model that predicts the probability distributions of the items given the input images, that will then be adjusted by the logic layer to improve the probability of *likely* (based on the number of different stable models that satisfy a certain situation) predictions and reduce the probability of *unlikely* predictions. The weights of the CNN model(s) are stored in `./results/neurasp/train-RUN`, where again `RUN` will be replaced by the corresponding run number. Also, we again store the `best.pt` and `last.pt` model weights.
+
+```console
+$ uv run train-neurasp.py
+validation accuracy before training: 0.00 %
+epoch 1/1:
+100%|██████████████████████████████████████| 500/500 [06:57<00:00,  1.20it/s]
+        training accuracy: 52.00 %
+        validation accuracy: 45.00 %
+NeurASP test accuracy: 50.00 %
+CNN test accuracy: 50.00 %
+```
+
+> [!NOTE] Lengthy Training Process
+> Since training requires computing all the stable models for each sample in the dataset, it is a very intensive and CPU heavy task. So it takes a lot of time and cannot be sped up with GPU utilization. I recommend keeping the amount of items and actions small, in order to reduce the search space for stable models.
+
+## Testing
+
+You can either test the CNN or the entire NeurASP model. For the former, you first need to look up the path to the model weights. If you trained your model using the `train-network.py` script, this will be similar to `./results/network/train-0/best.pt`. If you trained your model using the `train-neurasp.py` script, it will instead be something like `./results/neurasp/train-0/identify/best.pt`, where `identify` is the unique identifier for the neural network in the NeurASP model. Now, simply pass this path as the `--model` argument to the `test-network.py` script.
+
+```console
+$ uv run test-network.py --model ./results/neurasp/train-1/identify/best.pt
+[TEST]: loss: 0.0153: 100%|███████████████| 200/200 [00:00<00:00, 344.28it/s]
+test loss: 0.0338
+test accuracy: 95.50 %
+```
+
+If you want to test the entire NeurASP model, simply use the `test-neurasp.py` script and pass the model path as the `--model` argument argument. Note that the model path should point to point to the directory that contains all of the neural network weights. For example `./results/neurasp/train-0/`.
+
+```console
+$ uv run test-neurasp.py --model ./results/neurasp/train-1/
+NeurASP test accuracy: 71.00 %
+CNN test accuracy: 71.00 %
+```
+
+## Things to Try
+
+### Generate the ASP Program
+
+Once you have modified the config to your liking (e.g. by adding a few items and actions), you can generate the ASP program using:
+
+```console
+$ uv run generate-program.py
+time(1..2).
+have(X,0) :- init(X).
+{ occur(A,T) : action(A) } = 1 :- time(T).
+:- occur(A,T), pre(A,I), not have(I,T-1).
+have(I,T) :- time(T), have(I,T-1), not occur(A,T) : del(A,I).
+have(I,T) :- occur(A,T), add(A,I).
+item(0).
+item(1).
+item(2).
+item(3).
+item(4).
+item(5).
+item(6).
+action(make_coffee).
+pre(make_coffee,2).
+pre(make_coffee,3).
+add(make_coffee,1).
+del(make_coffee,2).
+del(make_coffee,3).
+action(bake_bread).
+pre(bake_bread,3).
+pre(bake_bread,5).
+add(bake_bread,6).
+del(bake_bread,3).
+del(bake_bread,5).
+action(wait).
+```
+
+### Find Stable Models
 
 Let's say, you want to check what things you can craft with *coffee beans* *water* and a *mortar*.
 Simply generate the ASP program with the initial inventory and then pass it on to `clingo`:
