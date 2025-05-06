@@ -148,8 +148,8 @@ NeurASP test accuracy: 50.00 %
 CNN test accuracy: 50.00 %
 ```
 
-> [!NOTE] Lengthy Training Process
-> Since training requires computing all the stable models for each sample in the dataset, it is a very intensive and CPU heavy task. So it takes a lot of time and cannot be sped up with GPU utilization. I recommend keeping the amount of items and actions small, in order to reduce the search space for stable models.
+> [!TIP]
+> **Experiencing lengthy training durations?** Since training requires computing all the stable models for each sample in the dataset, it is a very intensive and CPU heavy task. So it takes a lot of time and cannot be sped up with GPU utilization. I recommend keeping the amount of items and actions small, in order to reduce the search space for stable models.
 
 ## Testing
 
