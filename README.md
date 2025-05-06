@@ -15,6 +15,7 @@
     ```
 
 1. If you are using [`uv`](https://github.com/astral-sh/uv), simply install all dependencies using
+    - **NOTE:** Since the CNN used in this example is very small, it does not make a huge difference if you use a GPU or not.
 
     ```console
     uv sync --extra cpu     # if you simply want to use your CPU
@@ -49,6 +50,71 @@
     ```console
     uv run train-neurasp.py
     ```
+
+## Configuration
+
+The `strips.yml` file defines the configuration parameters for the task that the model is supposed to solve.
+
+- `time_steps`: each action requires one time steps, so this parameter defines the amount of actions that are applied between the initial and final inventory state
+- `inventory_size`: the maximum amount of initial items in the inventory
+- `items`: the available items
+  - `id`: a unique identifier of the item
+    - **NOTE:** `0` is a reserved identifier for the blank item (i.e. no item)
+  - `name`: a human readable identifier
+  - `path`: the path to the item sprite
+- `actions:` the available actions
+  - `name`: a unique identifier of the action
+    - **NOTE:** must only consist of upper case letters, lower case letters and the underscore `_` character
+  - `preconditions`: the items needed to apply this action
+  - `add_list`: the items that are created when applying this action
+  - `delete_list`: the items that are consumed/removed when applying this action
+
+```yml
+time_steps: 2
+inventory_size: 4
+items:
+  - id: 1
+    name: coffee
+    path: ./sprites/15-14.png
+  - id: 2
+    name: coffee_powder
+    path: ./sprites/15-11.png
+  - id: 3
+    name: water
+    path: ./sprites/19-5.png
+  - id: 4
+    name: milk
+    path: ./sprites/15-8.png
+  - id: 5
+    name: flour
+    path: ./sprites/15-10.png
+  - id: 6
+    name: bread
+    path: ./sprites/14-13.png
+actions:
+  - name: make_coffee
+    preconditions:
+      - coffee_powder
+      - water
+    add_list:
+      - coffee
+    delete_list:
+      - coffee_powder
+      - water
+  - name: bake_bread
+    preconditions:
+      - water
+      - flour
+    add_list:
+      - bread
+    delete_list:
+      - water
+      - flour
+  - name: wait
+    preconditions: []
+    add_list: []
+    delete_list: []
+```
 
 ## Find Stable Models
 
