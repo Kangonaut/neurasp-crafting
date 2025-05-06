@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic import BaseModel
 
 
@@ -10,7 +12,7 @@ class Action(BaseModel):
 
 class Item(BaseModel):
     id: int
-    path: str
+    path: Path
     name: str
 
 

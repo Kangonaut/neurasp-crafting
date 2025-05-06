@@ -11,8 +11,9 @@ import clingo
 import numpy as np
 import torch
 import torch.nn as nn
-from mvpp import MVPP
 from tqdm import tqdm
+
+from neurasp.mvpp import MVPP
 
 
 class NeurASP(object):

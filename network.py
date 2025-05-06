@@ -4,7 +4,7 @@ from torch import Tensor, nn
 
 # img input size: 3x224x224
 class ItemClassifier(nn.Module):
-    def __init__(self, num_classes: int, *args, **kwargs) -> None:
+    def __init__(self, num_classes: int, neurasp: bool = True, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cnn = nn.Sequential(
             # (3,32,32)
@@ -24,13 +24,21 @@ class ItemClassifier(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2),  # (32,14,14)
         )
-        self.fc = nn.Sequential(
-            nn.Linear(
-                in_features=32 * 14 * 14,
-                out_features=num_classes,
-            ),
-            nn.Softmax(1),
-        )
+        if neurasp:
+            self.fc = nn.Sequential(
+                nn.Linear(
+                    in_features=32 * 14 * 14,
+                    out_features=num_classes,
+                ),
+                nn.Softmax(1),
+            )
+        else:
+            self.fc = nn.Sequential(
+                nn.Linear(
+                    in_features=32 * 14 * 14,
+                    out_features=num_classes,
+                ),
+            )
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.cnn(x)
