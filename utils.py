@@ -135,9 +135,14 @@ def neurasp_train_epochs(
     for epoch_idx in range(num_epochs):
         print(f"epoch {epoch_idx + 1}/{num_epochs}:")
 
+        # shuffle
+        perm = random.sample(range(len(train_data)), len(train_data))
+        train_data_shuffled = [train_data[idx] for idx in perm]
+        train_obs_shuffled = [train_obs[idx] for idx in perm]
+
         model.learn(
-            dataList=train_data,
-            obsList=train_obs,
+            dataList=train_data_shuffled,
+            obsList=train_obs_shuffled,
             epoch=1,
             batchSize=1,
             bar=True,
@@ -292,7 +297,7 @@ def augment_image(
         fillcolor=fillcolor,
     )
 
-    radius = random.randint(1, 3)
+    radius = random.randint(1, 2)
     img = img.filter(ImageFilter.GaussianBlur(radius))
 
     return img
