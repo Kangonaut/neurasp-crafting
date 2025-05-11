@@ -1,5 +1,5 @@
-time_steps: 2
-inventory_size: 4
+time_steps: 1
+inventory_size: 3
 items:
   - id: 1
     name: coffee
@@ -19,6 +19,9 @@ items:
   - id: 6
     name: bread
     path: ./sprites/14-13.png
+  - id: 7
+    name: coffee_beans
+    path: ./sprites/12-6.png
 actions:
   - name: make_coffee
     preconditions:

@@ -144,7 +144,7 @@ def neurasp_train_epochs(
             dataList=train_data_shuffled,
             obsList=train_obs_shuffled,
             epoch=1,
-            batchSize=1,
+            batchSize=4,
             bar=True,
             smPickle=None,
         )
