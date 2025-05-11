@@ -186,10 +186,14 @@ def train_epochs(
 
         if storage_dir and test_acc > best_acc:
             best_acc = test_acc
-            torch.save(model.state_dict(), storage_dir / "best.pt")
+            path = storage_dir / "best.pt"
+            torch.save(model.state_dict(), path)
+            print(f"successfully saved model to: {path}")
 
     if storage_dir:
-        torch.save(model.state_dict(), storage_dir / "last.pt")
+        path = storage_dir / "last.pt"
+        torch.save(model.state_dict(), path)
+        print(f"successfully saved model to: {path}")
 
 
 def generate_asp_program(
